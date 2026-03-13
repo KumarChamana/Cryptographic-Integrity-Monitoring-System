@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Cryptographic Integrity Monitoring System</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+<style>
+
+body{
+font-family:monospace;
+color:#00ff9c;
+margin:0;
+padding:40px;
+}
+
+h1{
+text-align:center;
+color:#00ff9c;
+}
+
+h2{
+text-align:center;
+margin-bottom:20px;
+}
+
+.status{
+text-align:center;
+margin-bottom:20px;
+color:#22c55e;
+}
+
+.container{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:30px;
+position:relative;
+z-index:1;
+}
+
+.card{
+background:rgba(0,0,0,0.8);
+border:1px solid #00ff9c;
+padding:20px;
+border-radius:10px;
+}
+
+textarea{
+width:100%;
+height:90px;
+margin-top:10px;
+padding:10px;
+border:none;
+background:black;
+color:#00ff9c;
+}
+
+select,button{
+margin-top:10px;
+padding:10px;
+border:none;
+background:#00ff9c;
+color:black;
+font-weight:bold;
+cursor:pointer;
+}
+
+button:hover{
+background:#22c55e;
+}
+
+.result{
+margin-top:15px;
+font-weight:bold;
+}
+
+.success{color:#22c55e;}
+.error{color:#ef4444;}
+.warning{color:#facc15;}
+
+.terminal{
+margin-top:30px;
+background:black;
+border:1px solid #00ff9c;
+padding:20px;
+height:160px;
+overflow:auto;
+color:#00ff9c;
+}
+
+#matrix{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+z-index:-1;
+background:black;
+}
+
+footer{
+text-align:center;
+margin-top:30px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<canvas id="matrix"></canvas>
+
+<h1>🔐 Cryptographic Integrity Monitoring System</h1>
+
+<div class="status">
+● Secure Channel Active | Hash Engine Ready
+</div>
+
+<div class="container">
+
+<div class="card">
+
+<h3>🖥 Source Node (Transmission Console)</h3>
+
+<label>Hash Algorithm</label>
+
+<select id="algorithm">
+<option value="MD5">MD5</option>
+<option value="SHA1">SHA1</option>
+</select>
+
+<textarea id="senderMsg" placeholder="Inject Payload..."></textarea>
+
+<button onclick="generateMD()">Encrypt & Transmit</button>
+
+<textarea id="transmittedData" placeholder="Network Packet"></textarea>
+
+</div>
+
+<div class="card">
+
+<h3>🛰 Target Node (Integrity Scanner)</h3>
+
+<button onclick="verifyMessage()">Run Integrity Scan</button>
+
+<div id="result" class="result"></div>
+
+</div>
+
+</div>
+
+<div class="terminal">
+<pre id="logs">
+> Booting cyber integrity engine...
+> Loading cryptographic modules...
+> Awaiting payload transmission...
+</pre>
+</div>
+
+<footer>
+Cyber Security Lab | Hash Integrity Verification Console
+</footer>
+
+<script>
+
+function addLog(msg)
+{
+const logBox=document.getElementById("logs");
+logBox.innerHTML+="\n> "+msg;
+logBox.scrollTop=logBox.scrollHeight;
+}
+
+function computeHash(message,algorithm)
+{
+if(algorithm==="MD5")
+return CryptoJS.MD5(message).toString();
+else
+return CryptoJS.SHA1(message).toString();
+}
+
+function generateMD()
+{
+
+const msg=document.getElementById("senderMsg").value;
+const algo=document.getElementById("algorithm").value;
+
+const hash=computeHash(msg,algo);
+
+localStorage.setItem("originalMessage",msg);
+localStorage.setItem("originalHash",hash);
+
+const transmitted=msg+"||"+hash;
+
+document.getElementById("transmittedData").value=transmitted;
+
+addLog("Payload encrypted.");
+addLog("Hash generated: "+algo);
+addLog("Packet transmitted to target node.");
+
+}
+
+function verifyMessage()
+{
+
+const transmitted=document.getElementById("transmittedData").value;
+const algo=document.getElementById("algorithm").value;
+
+addLog("Integrity scan started...");
+
+if(!transmitted.includes("||"))
+{
+showResult("Invalid packet format","error");
+addLog("Packet corruption detected.");
+return;
+}
+
+const parts=transmitted.split("||");
+
+const receivedMsg=parts[0];
+const receivedHash=parts[1];
+
+const calculatedHash=computeHash(receivedMsg,algo);
+
+const originalMsg=localStorage.getItem("originalMessage");
+const originalHash=localStorage.getItem("originalHash");
+
+if(calculatedHash===receivedHash)
+{
+showResult("✔ Integrity verified. No tampering detected.","success");
+addLog("Integrity verified successfully.");
+return;
+}
+
+if(receivedMsg!==originalMsg)
+{
+showResult("✖ Payload modified during transmission.","error");
+addLog("Security alert: Payload tampering detected.");
+return;
+}
+
+if(receivedMsg===originalMsg && receivedHash!==originalHash)
+{
+showResult("⚠ Digest altered but payload intact.","warning");
+addLog("Hash mismatch detected.");
+return;
+}
+
+}
+
+function showResult(message,type)
+{
+const resultDiv=document.getElementById("result");
+resultDiv.className="result "+type;
+resultDiv.innerHTML=message;
+}
+
+</script>
+
+<script>
+
+const canvas=document.getElementById("matrix");
+const ctx=canvas.getContext("2d");
+
+canvas.height=window.innerHeight;
+canvas.width=window.innerWidth;
+
+const letters="01ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&@";
+const matrix=letters.split("");
+
+const fontSize=16;
+const columns=canvas.width/fontSize;
+
+const drops=[];
+
+for(let x=0;x<columns;x++)
+drops[x]=1;
+
+function draw(){
+
+ctx.fillStyle="rgba(0,0,0,0.05)";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+
+ctx.fillStyle="#00ff00";
+ctx.font=fontSize+"px monospace";
+
+for(let i=0;i<drops.length;i++){
+
+const text=matrix[Math.floor(Math.random()*matrix.length)];
+
+ctx.fillText(text,i*fontSize,drops[i]*fontSize);
+
+if(drops[i]*fontSize>canvas.height && Math.random()>0.975)
+drops[i]=0;
+
+drops[i]++;
+
+}
+
+}
+
+setInterval(draw,33);
+
+</script>
+
+</body>
+</html>
