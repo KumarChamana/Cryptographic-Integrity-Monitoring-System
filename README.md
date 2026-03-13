@@ -1,13 +1,15 @@
-Major Project: Scholarship Eligibility Prediction using DL & OCR
+>Cryptographic Message Integrity Verification
 
+This project verifies message integrity using MD5 and SHA-1 hashing algorithms.
 
-Features:
-- CGPA extraction from marks memo image
-- Deep Learning based eligibility prediction
-- Privacy-safe synthetic dataset
+>Features
+- Hash generation
+- Integrity verification
+- Cybersecurity dashboard UI
+- Matrix hacker background
 
-
-Run Order:
-1. python utils/data_generator.py
-2. python model/train_model.py
-3. python main.py
+>Technologies Used
+HTML
+CSS
+JavaScript
+CryptoJS
